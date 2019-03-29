@@ -71,7 +71,7 @@
             <h1>Beermoney Giveaway Eligibility Checker</h1>
 		<p class="lead">Get your Beermoney comments to check if you are eligible to post in the giveaway thread.</p>
 		<p class="lead">To be elgible, your account must be over 1 month old, and you must have commented in /r/beermoney within the last 12 months.</p>
-		<p class="lead">Gets your comments on /r/beermoney from the past 12 months. Reddit only gives the last 1000 comments total so if you are a very active user, this might not be accurate.</p>
+		<p class="lead">Gets your last 100 comments on /r/beermoney from the past 12 months.</p>
         </div>
 
         <div class="panel panel-success" id="warning">
@@ -80,8 +80,8 @@
             </div>
             <div class="panel-body">
                 <ul>
-                	<li>Gets your comments on /r/beermoney from the past 12 months. Reddit only gives the last 1000 comments total so if you are a very active user, this might not be accurate.</li>
-			<li>Does not check to make sure your account is more than 1 month old. Please check this manually, or be banned.</li>
+                	<li>Gets your last 100 comments on /r/beermoney from the past 12 months.</li>
+			<li>Does not check to make sure your account is more than 1 month old. Please check this manually before entering.</li>
                 </ul>
                 <p><strong>Everything is fetched locally by your browser so don't abuse this by checking everyone's comments. Doing so might cause reddit to place limits on you.</strong></p>
 
@@ -115,10 +115,13 @@
     </div>
     <!-- /container -->
     <script>
-        //var karma = 0;
 		var commentCount = 0;
 		var comments = 0;
         var finishedTwelveMonths = false;
+		//define Post's Creation Date (created_utc) and 12months
+		var UTCGiveawayDate = 1553819281;
+		var UTCTwelveMonthsAgo = 1522283282;
+
         function start() {
             $("#warning").slideUp();
             $("#inputform").slideUp();
@@ -127,80 +130,68 @@
             process();
             return;
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        function process(afterComment) {
-            $.getJSON('https://www.reddit.com/user/' + $("#username").val() + '/comments.json', {
-                    sort: "new",
-                    limit: "100",
-                    after: afterComment,
-                    raw_json: "1"
-                },
-                function(obj) {
-                    commentCount += obj.data.children.length;
-                    $("#commentcount").html(commentCount);
-                    //define Post's Creation Date (created_utc) and 12months
-					UTCGiveawayDate = 1552921502;
-					UTCTwelveMonthsAgo = 1521385504;
-                    $.each(obj.data.children, function() {
-                        if (this.data['subreddit'] == "beermoney" && this.data['created_utc'] < UTCGiveawayDate) {
-							//Did we finish 12 months?
-                            if (this.data['created_utc'] < UTCTwelveMonthsAgo) {
-                                finishedTwelveMonths = true;
-                                return false;
-                            }
-                            //calculate score
-                            //var score = this.data['score'];
-                            //if (score > 0) score -= 1;
-                            //else
-                            //    score = 0;
-                            //karma += score;
-                            
-							//update table
-							comments += 1;
-                            var commentUTC = this.data['created_utc'];
-							var commentDate = new Date(commentUTC * 1000).toLocaleString("en-US");
-							
-							var commentLink = $("<a />", {
-                                href: "https://www.reddit.com/" + this.data['permalink'],
-                                text: ("" + this.data['body']).trunc(125),
-                                target: "_blank"
-                            });
-                            $("#outputtable > tbody > tr").length
-                            $("#outputtable").find('tbody')
-                                .append($('<tr>')
-                                    .append($('<td>').append($("#outputtable > tbody > tr").length + 1))
-                                    .append($('<td>').append(commentLink))
-									.append($('<td>').append(commentDate))
-                                    //.append($('<td>').append(score))
-                                )
-                        }
-                    });
-                    if (obj.data.after != null && !finishedTwelveMonths) {
-                        var callprocess = process(obj.data.after);
-                        setTimeout(callprocess, 1000);
-                    } else
-                        end();
-                });
-            return;
-        }
+		
+		function process() {
+			$.getJSON('https://api.pushshift.io/reddit/search/comment/', {
+				subreddit: "beermoney",
+				before: UTCGiveawayDate,
+				after: UTCTwelveMonthsAgo,
+				size: "100",
+				sort: "desc",
+				author: $("#username").val(),
+			},
+				function(obj) {
+					var commentID = this.data['id'];
+					$.each(obj.data, function() {
+						$.getJSON('https://www.reddit.com/r/beermoney/api/info.json', {
+							id: "t1_" + commentID,
+						}
+						function(obj2) {
+							$.each(obj2.data.children, function() {
+								if (this.data['body'] != "[removed]" && this.data['created_utc'] < UTCGiveawayDate) {
+									commentCount += obj2.data.children.length;
+									$("#commentcount").html(commentCount);
+									//Did we finish 12 months?
+									if (this.data['created_utc'] < UTCTwelveMonthsAgo) {
+										finishedTwelveMonths = true;
+										return false;
+									}	
+									comments += 1;
+									var commentUTC = this.data['created_utc'];
+									var commentDate = new Date(commentUTC * 1000).toLocaleString("en-US");
+									var commentLink = $("<a />", {
+										href: "https://www.reddit.com/" + this.data['permalink'],
+										text: ("" + this.data['body']).trunc(125),
+										target: "_blank"
+									});
+									$("#outputtable > tbody > tr").length
+									$("#outputtable").find('tbody')
+									.append($('<tr>')
+										.append($('<td>').append($("#outputtable > tbody > tr").length + 1))
+										.append($('<td>').append(commentLink))
+										.append($('<td>').append(commentDate))
+									)
+								}	
+							});	
+							if (!finishedTwelveMonths) {
+								setTimeout(obj, 100);
+							} else
+								end();
+						});
+					return;
+					});
+				}
+			);
+		return;
+		}
+
         function end() {
-            $("#statusline").slideUp();
-            //$("#score").text(karma);
-			$("#comments").text(comments);
-			$("#resultpanel").removeClass('hidden');
-            return;
-        }
+        	$("#statusline").slideUp();
+		$("#comments").text(comments);
+		$("#resultpanel").removeClass('hidden');
+        	return;
+        }		
+
         String.prototype.trunc =
             function(n) {
                 return this.substr(0, n - 1) + (this.length > n ? '...' : '');
