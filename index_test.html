@@ -2,11 +2,11 @@
 <html lang="en">
 
 <head>
-    <link rel="apple-touch-icon" sizes="180x180" href="/beermoneycheck/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/beermoneycheck/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/beermoneycheck/favicon-16x16.png">
-    <link rel="manifest" href="/beermoneycheck/site.webmanifest">
-    <link rel="mask-icon" href="/beermoneycheck/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta charset="utf-8">
@@ -71,7 +71,7 @@
             <h1>Beermoney Giveaway Eligibility Checker</h1>
 		<p class="lead">Get your Beermoney comments to check if you are eligible to post in the giveaway thread.</p>
 		<p class="lead">To be elgible, your account must be over 1 month old, and you must have commented in /r/beermoney within the last 12 months.</p>
-		<p class="lead">Gets your last 100 comments on /r/beermoney from the past 12 months.</p>
+		<p class="lead">Gets your comments on /r/beermoney from the past 12 months. Reddit only gives the last 1000 comments total so if you are a very active user, this might not be accurate.</p>
         </div>
 
         <div class="panel panel-success" id="warning">
@@ -80,8 +80,8 @@
             </div>
             <div class="panel-body">
                 <ul>
-                	<li>Gets your last 100 comments on /r/beermoney from the past 12 months.</li>
-			<li>Does not check to make sure your account is more than 1 month old. Please check this manually before entering.</li>
+                	<li>Gets your comments on /r/beermoney from the past 12 months. Reddit only gives the last 1000 comments total so if you are a very active user, this might not be accurate.</li>
+			<li>Does not check to make sure your account is more than 1 month old. Please check this manually, or be banned.</li>
                 </ul>
                 <p><strong>Everything is fetched locally by your browser so don't abuse this by checking everyone's comments. Doing so might cause reddit to place limits on you.</strong></p>
 
@@ -140,56 +140,40 @@
 				sort: "desc",
 				author: $("#username").val(),
 			},
-				function(obj) {
-					var commentID = this.data['id'];
-					$.each(obj.data, function() {
-						$.getJSON('https://www.reddit.com/r/beermoney/api/info.json', {
-							id: "t1_" + commentID,
-						}
-						function(obj2) {
-							$.each(obj2.data.children, function() {
-								if (this.data['body'] != "[removed]" && this.data['created_utc'] < UTCGiveawayDate) {
-									commentCount += obj2.data.children.length;
-									$("#commentcount").html(commentCount);
-									//Did we finish 12 months?
-									if (this.data['created_utc'] < UTCTwelveMonthsAgo) {
-										finishedTwelveMonths = true;
-										return false;
-									}	
-									comments += 1;
-									var commentUTC = this.data['created_utc'];
-									var commentDate = new Date(commentUTC * 1000).toLocaleString("en-US");
-									var commentLink = $("<a />", {
-										href: "https://www.reddit.com/" + this.data['permalink'],
-										text: ("" + this.data['body']).trunc(125),
-										target: "_blank"
-									});
-									$("#outputtable > tbody > tr").length
-									$("#outputtable").find('tbody')
-									.append($('<tr>')
-										.append($('<td>').append($("#outputtable > tbody > tr").length + 1))
-										.append($('<td>').append(commentLink))
-										.append($('<td>').append(commentDate))
-									)
-								}	
-							});	
-							if (!finishedTwelveMonths) {
-								setTimeout(obj, 100);
-							} else
-								end();
-						});
-					return;
-					});
-				}
-			);
-		return;
+			function (obj) {
+				$.each(obj.data, function () {
+					$.getJSON('https://www.reddit.com/r/beermoney/api/info.json?t1_' + this.data['id'],
+					function (id) {
+						$.each(id.data.children, function () {
+							if (this.data['body'] != "[removed]" && this.data['created_utc'] < UTCGiveawayDate) {
+								comments += 1;
+								var commentUTC = this.data['created_utc'];
+								var commentDate = new Date(commentUTC * 1000).toLocaleString("en-US");
+								var commentLink = $("<a />", {
+									href: "https://www.reddit.com/" + this.data['permalink'],
+									text: ("" + this.data['body']).trunc(125),
+									target: "_blank"
+								});
+								$("#outputtable > tbody > tr").length
+								$("#outputtable").find('tbody')
+								.append($('<tr>')
+									.append($('<td>').append($("#outputtable > tbody > tr").length + 1))
+									.append($('<td>').append(commentLink))
+									.append($('<td>').append(commentDate))
+								)
+							}	
+						});	
+					});	
+				});
+				end();
+			}
 		}
-
+			
         function end() {
-        	$("#statusline").slideUp();
-		$("#comments").text(comments);
-		$("#resultpanel").removeClass('hidden');
-        	return;
+            $("#statusline").slideUp();
+			$("#comments").text(comments);
+			$("#resultpanel").removeClass('hidden');
+            return;
         }		
 
         String.prototype.trunc =
