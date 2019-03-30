@@ -141,7 +141,7 @@
 				author: $("#username").val(),
 			},
 			function (obj) {
-				$.each(obj.data, function () {
+				$.each(obj, function () {
 					if (this.data['id'] != undefined) {
 						$.getJSON('https://www.reddit.com/r/beermoney/api/info.json?t1_' + this.data['id'],
 						function (obj2) {
