@@ -1,16 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-    <link rel="apple-touch-icon" sizes="180x180" href="/beermoneycheck/apple-touch-icon.png">
+    <meta charset="utf-8">
+	<meta http-equiv="Content-Type" content="text/html">
+	<meta name="author" content="/u/jonflow">
+	<link rel="apple-touch-icon" sizes="180x180" href="/beermoneycheck/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/beermoneycheck/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/beermoneycheck/favicon-16x16.png">
     <link rel="manifest" href="/beermoneycheck/site.webmanifest">
     <link rel="mask-icon" href="/beermoneycheck/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
@@ -25,7 +26,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
     <!-- Custom styles for this template -->
     <style>
@@ -95,7 +96,7 @@
         <div class="panel panel-success text-center hidden" id="resultpanel">
             <div class="panel-body">
                 <p>Your 12 month Beermoney Comment count is:</p>
-                <h1 id="comments"></h1>
+                <h1 id="comments"></h1> (and another <span id="removedcomments">0</span> removed/deleted)
             </div>
         </div>
         <hr>
@@ -117,6 +118,7 @@
     <script>
 		var commentCount = 0;
 		var comments = 0;
+		var removedcomments = 0;
         var finishedTwelveMonths = false;
 		//define Post's Creation Date (created_utc) and 12months
 		var UTCGiveawayDate = 1553819281;
@@ -136,23 +138,28 @@
 				subreddit: "beermoney",
 				before: UTCGiveawayDate,
 				after: UTCTwelveMonthsAgo,
-				size: "100",
+				size: "2000",
 				sort: "desc",
 				author: $("#username").val(),
 				filter: "id"
 			},
 			function(pushshift) {
-					$.each(pushshift.data, function(i, id) {
-						console.log(id);
-						$.getJSON('https://www.reddit.com/r/beermoney/api/info.json', { id: "t1_" + id }, function(reddit) {
-							console.log(reddit);
-							if (reddit.data.children.data.body != "[removed]") {
-								comments += 1;
-								var commentUTC = reddit.data.children.data.created_utc;
-								var commentDate = new Date(commentUTC * 1000).toLocaleString("en.US");
+					var listing = pushshift.data;
+					for(var i=0, l=listing.length; i<l; i++) {
+						var psdata = listing[i];
+						//console.log(listing);
+						//console.log(listing[i]);
+						//setTimeout(function() {
+						$.getJSON('https://www.reddit.com/r/beermoney/api/info.json', { id: "t1_" + psdata['id'] }, function(reddit) {
+							var rlisting = reddit.data.children[0];
+							//console.log(rlisting);
+							if (rlisting.data.body != "[deleted]" && rlisting.data.body != "[removed]") {
+								//console.log(rlisting.data['body']);
+								var commentUTC = rlisting.data['created_utc'];
+								var commentDate = new Date(commentUTC * 1000).toLocaleString("en-US");
 								var commentLink = $("<a />", {
-									href: "https://www.reddit.com/" + reddit.data.children.data.permalink,
-									text: ("" + reddit.data.children.data.body).trunc(125),
+									href: "https://www.reddit.com/" + rlisting.data['permalink'],
+									text: ("" + rlisting.data['body']).trunc(125),
 									target: "_blank"
 								});
 								$("#outputtable > tbody > tr").length
@@ -162,20 +169,30 @@
 									.append($('<td>').append(commentLink))
 									.append($('<td>').append(commentDate))
 								)
-							}
-						});
-					});
-				}
-			);
-			end();
-		}
+								comments += 1;
+								commentCount += reddit.data.children.length;
+								$("#commentcount").html(commentCount);
+								
+							} else {
+								removedcomments += 1;//end if
+								}
+						}); //end getJSON
+						//}, 3000); //end setTimeout
+					end(); } //end for loop
+				} //end function
+			); //end getJSON
+			return;
+		} //close function
 		
         function end() {
-            $("#statusline").slideUp();
-			$("#comments").text(comments);
-			$("#resultpanel").removeClass('hidden');
-            return;
-        }		
+			setTimeout(function() {
+				$("#statusline").slideUp();
+				$("#comments").text(comments);
+				$("#removedcomments").text(removedcomments);
+				$("#resultpanel").removeClass('hidden');
+				return;
+			}, 10000);
+        }
 
         String.prototype.trunc =
             function(n) {
