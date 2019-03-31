@@ -144,7 +144,6 @@
 			function(pushshift) {
 					$.each(pushshift.data, function(i, id) {
 						console.log(id);
-						setTimeout(function() {
 						$.getJSON('https://www.reddit.com/r/beermoney/api/info.json', { id: "t1_" + id }, function(reddit) {
 							console.log(reddit);
 							if (reddit.data.children.data.body != "[removed]") {
@@ -165,7 +164,6 @@
 								)
 							}
 						});
-						}, 500);
 					});
 				}
 			);
