@@ -145,7 +145,7 @@
 				var idnumber = psID['id'];
 				console.log("idnumber is: " + idnumber);
 				$.each(idnumber, function() {
-					$.getJSON('https://www.reddit.com/r/beermoney/api/info.json?t1_' + idnumber,
+					$.getJSON('https://www.reddit.com/r/beermoney/api/info.json?id=t1_' + idnumber,
 					function(obj) {
 						if (obj.data.children['body'] != "[removed]" && obj.data.body['created_utc'] < UTCGiveawayDate) {
 							comments += 1;
