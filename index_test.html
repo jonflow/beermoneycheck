@@ -142,17 +142,17 @@
 			},
 			
 			function(psID) {
-				var idnumber = psID.id;
+				var idnumber = psID['id'];
 				$.each(idnumber, function() {
 					$.getJSON('https://www.reddit.com/r/beermoney/api/info.json?t1_' + idnumber,
 					function(obj) {
-						if (obj.data.children.body != "[removed]" && obj.data.body.created_utc < UTCGiveawayDate) {
-							comments += `;
-							var commentUTC = obj.data.children.created_utc;
+						if (obj.data.children['body'] != "[removed]" && obj.data.body['created_utc'] < UTCGiveawayDate) {
+							comments += 1;
+							var commentUTC = obj.data.children['created_utc'];
 							var commentDate = new Date(commentUTC * 1000).toLocaleString("en-US");
 							var commentLink = $("<a />", {
-								href: "https://www.reddit.com/" + obj.data.children.permalink,
-								text: ("" + obj.data.children.body).trunc(125),
+								href: "https://www.reddit.com/" + obj.data.children['permalink'],
+								text: ("" + obj.data.children['body']).trunc(125),
 								target: "_blank"
 							});
 							$("#outputtable > tbody > tr").length
