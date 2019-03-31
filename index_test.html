@@ -142,8 +142,8 @@
 			},
 			
 			function(psID) {
-				$.each(psID['id'], function() {
 				var idnumber = psID['id'];
+				console.log("idnumber is: " + idnumber);
 				$.each(idnumber, function() {
 					$.getJSON('https://www.reddit.com/r/beermoney/api/info.json?t1_' + idnumber,
 					function(obj) {
@@ -170,7 +170,6 @@
 				return;
 			});
 			return;
-			});
 		}
 			
         function end() {
