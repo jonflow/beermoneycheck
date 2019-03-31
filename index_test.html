@@ -139,39 +139,39 @@
 				size: "100",
 				sort: "desc",
 				author: $("#username").val(),
+				filter: "id"
 			},
-			
-			function(psID) {
-				var idnumber = psID['id'];
-				console.log("idnumber is: " + idnumber);
-				$.each(idnumber, function() {
-					$.getJSON('https://www.reddit.com/r/beermoney/api/info.json?id=t1_' + idnumber,
-					function(obj) {
-						if (obj.data.children['body'] != "[removed]" && obj.data.body['created_utc'] < UTCGiveawayDate) {
-							comments += 1;
-							var commentUTC = obj.data.children['created_utc'];
-							var commentDate = new Date(commentUTC * 1000).toLocaleString("en-US");
-							var commentLink = $("<a />", {
-								href: "https://www.reddit.com/" + obj.data.children['permalink'],
-								text: ("" + obj.data.children['body']).trunc(125),
-								target: "_blank"
-							});
-							$("#outputtable > tbody > tr").length
-							$("#outputtable").find('tbody')
-							.append($('<tr>')
-								.append($('<td>').append($("#outputtable > tbody > tr").length + 1))
-								.append($('<td>').append(commentLink))
-								.append($('<td>').append(commentDate))
-							)
-						}	
-					});	
-				});
-				end();
-				return;
-			});
-			return;
+			function(pushshift) {
+					$.each(pushshift.data, function(i, id) {
+						console.log(id);
+						setTimeout(function() {
+						$.getJSON('https://www.reddit.com/r/beermoney/api/info.json', { id: "t1_" + id }, function(reddit) {
+							console.log(reddit);
+							if (reddit.data.children.data.body != "[removed]") {
+								comments += 1;
+								var commentUTC = reddit.data.children.data.created_utc;
+								var commentDate = new Date(commentUTC * 1000).toLocaleString("en.US");
+								var commentLink = $("<a />", {
+									href: "https://www.reddit.com/" + reddit.data.children.data.permalink,
+									text: ("" + reddit.data.children.data.body).trunc(125),
+									target: "_blank"
+								});
+								$("#outputtable > tbody > tr").length
+								$("#outputtable").find('tbody')
+								.append($('<tr>')
+									.append($('<td>').append($("#outputtable > tbody > tr").length + 1))
+									.append($('<td>').append(commentLink))
+									.append($('<td>').append(commentDate))
+								)
+							}
+						});
+						}, 500);
+					});
+				}
+			);
+			end();
 		}
-			
+		
         function end() {
             $("#statusline").slideUp();
 			$("#comments").text(comments);
