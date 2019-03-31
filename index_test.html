@@ -140,32 +140,31 @@
 				sort: "desc",
 				author: $("#username").val(),
 			},
-			function (obj) {
-				$.each(obj, function () {
-					if (this.data['id'] != undefined) {
-						$.getJSON('https://www.reddit.com/r/beermoney/api/info.json?t1_' + this.data['id'],
-						function (obj2) {
-							$.each(obj2.data.children, function () {
-								if (this.data['body'] != "[removed]" && this.data['created_utc'] < UTCGiveawayDate) {
-									comments += 1;
-									var commentUTC = this.data['created_utc'];
-									var commentDate = new Date(commentUTC * 1000).toLocaleString("en-US");
-									var commentLink = $("<a />", {
-										href: "https://www.reddit.com/" + this.data['permalink'],
-										text: ("" + this.data['body']).trunc(125),
-										target: "_blank"
-									});
-									$("#outputtable > tbody > tr").length
-									$("#outputtable").find('tbody')
-									.append($('<tr>')
-										.append($('<td>').append($("#outputtable > tbody > tr").length + 1))
-										.append($('<td>').append(commentLink))
-										.append($('<td>').append(commentDate))
-									)
-								}	
-							});	
+			function(psID) {
+				var idnumber = psID.id;
+				$.each(idnumber, function() {
+					$.getJSON('https://www.reddit.com/r/beermoney/api/info.json?t1_' + idnumber,
+					function (obj) {
+						$.each(obj.data.children, function(redditdata) {
+							if (redditdata.body != "[removed]" && redditdata.created_utc < UTCGiveawayDate) {
+								comments += 1;
+								var commentUTC = redditdata.created_utc;
+								var commentDate = new Date(commentUTC * 1000).toLocaleString("en-US");
+								var commentLink = $("<a />", {
+									href: "https://www.reddit.com/" + redditdata.permalink,
+									text: ("" + redditdata.body).trunc(125),
+									target: "_blank"
+								});
+								$("#outputtable > tbody > tr").length
+								$("#outputtable").find('tbody')
+								.append($('<tr>')
+									.append($('<td>').append($("#outputtable > tbody > tr").length + 1))
+									.append($('<td>').append(commentLink))
+									.append($('<td>').append(commentDate))
+								)
+							}	
 						});	
-					} else { end(); }
+					});	
 				});
 				end();
 			});
