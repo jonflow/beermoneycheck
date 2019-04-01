@@ -191,7 +191,7 @@
 				console.log(listing.length - removedcomments);
 				var totalcomments = listing.length - removedcomments;
 				var allcomments = $("#outputtable > tbody > tr").length + removedcomments;
-				if ($("#outputtable > tbody > tr").length == totalcomments || allcomments >= 1000) {
+				if ($("#outputtable > tbody > tr").length == comments) {
 					for (x=0; x<100; x++) {clearInterval(x);}
 					$("#statusline").slideUp();
 					$("#comments").text(comments);
