@@ -189,21 +189,21 @@
 				var totalcomments = listing.length - removedcomments;
 				var allcomments = $("#outputtable > tbody > tr").length + removedcomments;
 				var tablelength = $("#outputtable > tbody > tr").length;
-				console.log("comments: "+comments);
-				console.log("outputtable > tbody > tr: "+tablelength);
-				console.log("totalcomments: "+totalcomments);
-				console.log("listing length: "+listing.length);
-				console.log("removedcomments: "+removedcomments);
-				console.log("allcomments: "+allcomments);
+				//console.log("comments: "+comments);
+				//console.log("outputtable > tbody > tr: "+tablelength);
+				//console.log("totalcomments: "+totalcomments);
+				//console.log("listing length: "+listing.length);
+				//console.log("removedcomments: "+removedcomments);
+				//console.log("allcomments: "+allcomments);
 				if (tablelength == totalcomments) {
-					for (x=0; x<100; x++) {clearInterval(x);}
-					console.log("done");
+					for (x=0; x<1000; x++) { clearInterval(x); }
+					//console.log("done");
 					$("#statusline").slideUp();
 					$("#comments").text(comments);
 					$("#removedcomments").text(removedcomments);
 					$("#resultpanel").removeClass('hidden');
 				}
-			}, 1500);
+			}, 3000);
 		}
 //       function end() {
 //			setTimeout(function() {
