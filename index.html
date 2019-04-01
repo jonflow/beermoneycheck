@@ -188,20 +188,20 @@
 			setInterval(function () {
 				var totalcomments = listing.length - removedcomments;
 				var allcomments = $("#outputtable > tbody > tr").length + removedcomments;
-				var tablelength = $("#outputtable > tbody > tr").length
+				var tablelength = $("#outputtable > tbody > tr").length;
 				console.log("comments: "+comments);
 				console.log("outputtable > tbody > tr: "+tablelength);
 				console.log("totalcomments: "+totalcomments);
 				console.log("listing length: "+listing.length);
 				console.log("removedcomments: "+removedcomments);
 				console.log("allcomments: "+allcomments);
-				if ($("#outputtable > tbody > tr").length == totalcomments) {
+				if (tablelength == totalcomments) {
 					for (x=0; x<100; x++) {clearInterval(x);}
+					console.log("done");
 					$("#statusline").slideUp();
 					$("#comments").text(comments);
 					$("#removedcomments").text(removedcomments);
 					$("#resultpanel").removeClass('hidden');
-					return;
 				}
 			}, 1500);
 		}
