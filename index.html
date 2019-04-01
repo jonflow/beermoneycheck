@@ -70,9 +70,10 @@
 
         <div class="page-header">
             <h1>Beermoney Giveaway Eligibility Checker</h1>
+		<p class="lead">Current Giveaway Thread: <a href="https://www.reddit.com/r/beermoney/comments/b6qn6r/gaingg_20050x220x5_amazon_usd_giveaway/">GAIN.GG | $200($50x2$20x5) Amazon USD Giveaway!</a>
 		<p class="lead">Get your Beermoney comments to check if you are eligible to post in the giveaway thread.</p>
-		<p class="lead">To be elgible, your account must be over 1 month old, and you must have commented in /r/beermoney within the last 12 months.</p>
-		<p class="lead">Gets your comments on /r/beermoney from the past 12 months. Reddit only gives the last 1000 comments total so if you are a very active user, this might not be accurate.</p>
+		<p class="lead">To be elgible, your account must be over 1 month old, and you must have commented in /r/beermoney within the last 12 months. Comments that have been removed by a mod or deleted by you do not count.</p>
+		<p class="lead">Gets your comments on /r/beermoney from the 12 month period prior to the latest Giveaway post. (Comments are not in date order.)</p>
         </div>
 
         <div class="panel panel-success" id="warning">
@@ -81,8 +82,8 @@
             </div>
             <div class="panel-body">
                 <ul>
-                	<li>Gets your comments on /r/beermoney from the past 12 months. Reddit only gives the last 1000 comments total so if you are a very active user, this might not be accurate.</li>
-			<li>Does not check to make sure your account is more than 1 month old. Please check this manually, or be banned.</li>
+                	<li>Gets your comments on /r/beermoney from the 12 month period prior to the latest Giveaway post. (Comments are not in date order.)</li>
+					<li>Does not check to make sure your account is more than 1 month old prior to the recent Giveaway post. Please check this manually, or risk being banned.</li>
                 </ul>
                 <p><strong>Everything is fetched locally by your browser so don't abuse this by checking everyone's comments. Doing so might cause reddit to place limits on you.</strong></p>
 
@@ -105,8 +106,8 @@
             <thead>
                 <tr>
                     <th>#</th>
-			<th>Comment</th>
-			<th>Comment Date</th>
+					<th>Comment</th>
+					<th>Comment Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -144,12 +145,12 @@
 				filter: "id"
 			},
 			function(pushshift) {
-					var listing = pushshift.data;
-					for(var i=0, l=listing.length; i<l; i++) {
-						var psdata = listing[i];
+					listing = pushshift.data;
+					//for(var i=0, l=listing.length; i<l; i++) {
+					$.each(listing, function(i, psdata) {		
+						//var psdata = listing[i];
 						//console.log(listing);
 						//console.log(listing[i]);
-						//setTimeout(function() {
 						$.getJSON('https://www.reddit.com/r/beermoney/api/info.json', { id: "t1_" + psdata['id'] }, function(reddit) {
 							var rlisting = reddit.data.children[0];
 							//console.log(rlisting);
@@ -173,26 +174,41 @@
 								commentCount += reddit.data.children.length;
 								$("#commentcount").html(commentCount);
 								
-							} else {
-								removedcomments += 1;//end if
-								}
+							} else { removedcomments += 1; }//end if
 						}); //end getJSON
-						//}, 3000); //end setTimeout
-					end(); } //end for loop
-				} //end function
+					}); //end each
+					//} //end for loop
+				end(); } //end of pushshift
 			); //end getJSON
 			return;
-		} //close function
+		} //close process function
 		
-        function end() {
-			setTimeout(function() {
-				$("#statusline").slideUp();
-				$("#comments").text(comments);
-				$("#removedcomments").text(removedcomments);
-				$("#resultpanel").removeClass('hidden');
-				return;
-			}, 10000);
-        }
+
+		function end() {
+			setInterval(function () {
+				console.log(comments);
+				console.log($("#outputtable > tbody > tr").length);
+				console.log(listing.length - removedcomments);
+				var totalcomments = listing.length - removedcomments;
+				if ($("#outputtable > tbody > tr").length == totalcomments) {
+					for (x=0; x<100; x++) {clearInterval(x);}
+					$("#statusline").slideUp();
+					$("#comments").text(comments);
+					$("#removedcomments").text(removedcomments);
+					$("#resultpanel").removeClass('hidden');
+					return;
+				}
+			}, 1000);
+		}
+//       function end() {
+//			setTimeout(function() {
+//				$("#statusline").slideUp();
+//				$("#comments").text(comments);
+//				$("#removedcomments").text(removedcomments);
+//				$("#resultpanel").removeClass('hidden');
+//				return;
+//			}, 10000);
+//        }
 
         String.prototype.trunc =
             function(n) {
