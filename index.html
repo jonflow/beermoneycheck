@@ -139,7 +139,7 @@
 				subreddit: "beermoney",
 				before: UTCGiveawayDate,
 				after: UTCTwelveMonthsAgo,
-				size: "2000",
+				size: "1000",
 				sort: "desc",
 				author: $("#username").val(),
 				filter: "id"
@@ -185,21 +185,21 @@
 		
 
 		function end() {
-			setTimeout(function () {
-				//console.log(comments);
-				//console.log($("#outputtable > tbody > tr").length);
-				//console.log(listing.length - removedcomments);
-				//var totalcomments = listing.length - removedcomments;
-				//var allcomments = $("#outputtable > tbody > tr").length + removedcomments;
-				//if ($("#outputtable > tbody > tr").length == comments) {
-				//	for (x=0; x<100; x++) {clearInterval(x);}
+			setInterval(function () {
+				console.log(comments);
+				console.log($("#outputtable > tbody > tr").length);
+				console.log(listing.length - removedcomments);
+				var totalcomments = listing.length - removedcomments;
+				var allcomments = $("#outputtable > tbody > tr").length + removedcomments;
+				if ($("#outputtable > tbody > tr").length == totalcomments) {
+					for (x=0; x<100; x++) {clearInterval(x);}
 					$("#statusline").slideUp();
 					$("#comments").text(comments);
 					$("#removedcomments").text(removedcomments);
 					$("#resultpanel").removeClass('hidden');
 					return;
-				//}
-			}, 10000);
+				}
+			}, 1500);
 		}
 //       function end() {
 //			setTimeout(function() {
