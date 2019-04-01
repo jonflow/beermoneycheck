@@ -188,8 +188,9 @@
 			setInterval(function () {
 				var totalcomments = listing.length - removedcomments;
 				var allcomments = $("#outputtable > tbody > tr").length + removedcomments;
+				var tablelength = $("#outputtable > tbody > tr").length
 				console.log("comments: "+comments);
-				console.log("$("#outputtable > tbody > tr").length: "+$("#outputtable > tbody > tr").length);
+				console.log("outputtable > tbody > tr: "+tablelength);
 				console.log("totalcomments: "+totalcomments);
 				console.log("listing length: "+listing.length);
 				console.log("removedcomments: "+removedcomments);
