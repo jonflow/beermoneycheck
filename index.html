@@ -186,11 +186,14 @@
 
 		function end() {
 			setInterval(function () {
-				console.log(comments);
-				console.log($("#outputtable > tbody > tr").length);
-				console.log(listing.length - removedcomments);
 				var totalcomments = listing.length - removedcomments;
 				var allcomments = $("#outputtable > tbody > tr").length + removedcomments;
+				console.log("comments: "+comments);
+				console.log("$("#outputtable > tbody > tr").length: "+$("#outputtable > tbody > tr").length);
+				console.log("totalcomments: "+totalcomments);
+				console.log("listing length: "+listing.length);
+				console.log("removedcomments: "+removedcomments);
+				console.log("allcomments: "+allcomments);
 				if ($("#outputtable > tbody > tr").length == totalcomments) {
 					for (x=0; x<100; x++) {clearInterval(x);}
 					$("#statusline").slideUp();
