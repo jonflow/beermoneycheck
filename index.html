@@ -97,7 +97,10 @@
         <div class="panel panel-success text-center hidden" id="resultpanel">
             <div class="panel-body">
                 <p>Your 12 month Beermoney Comment count is:</p>
-                <h1 id="comments"></h1> (and another <span id="removedcomments">0</span> removed/deleted)
+                <h2 id="comments"></h2> (and another <span id="removedcomments">0</span> removed/deleted)
+				<hr style="width:25%">
+				<p>Your 12 month Beermoney Comment karma is:</p>
+				<h2 id="commentkarma"></h2>
             </div>
         </div>
         <hr>
@@ -107,6 +110,7 @@
                 <tr>
                     <th>#</th>
 					<th>Comment</th>
+					<th>Score</th>
 					<th>Comment Date</th>
                 </tr>
             </thead>
@@ -118,9 +122,10 @@
     <!-- /container -->
     <script>
 		var commentCount = 0;
+		var karma = 0;
 		var comments = 0;
 		var removedcomments = 0;
-        var finishedTwelveMonths = false;
+        //var finishedTwelveMonths = false;
 		//define Post's Creation Date (created_utc) and 12months
 		var UTCGiveawayDate = 1553819281;
 		var UTCTwelveMonthsAgo = 1522283282;
@@ -157,17 +162,25 @@
 							if (rlisting.data.body != "[deleted]" && rlisting.data.body != "[removed]") {
 								//console.log(rlisting.data['body']);
 								var commentUTC = rlisting.data['created_utc'];
+								
 								var commentDate = new Date(commentUTC * 1000).toLocaleString("en-US");
+								
 								var commentLink = $("<a />", {
 									href: "https://www.reddit.com/" + rlisting.data['permalink'],
 									text: ("" + rlisting.data['body']).trunc(125),
 									target: "_blank"
 								});
+								
+								var score = rlisting.data['score'];
+								karma += score;
+								$("#commentkarma").html(karma);
+								
 								$("#outputtable > tbody > tr").length
 								$("#outputtable").find('tbody')
 								.append($('<tr>')
 									.append($('<td>').append($("#outputtable > tbody > tr").length + 1))
 									.append($('<td>').append(commentLink))
+									.append($('<td>').append(score))
 									.append($('<td>').append(commentDate))
 								)
 								comments += 1;
@@ -221,6 +234,7 @@
             };
     </script>
 	
+	<p>Last updated: April 2, 2019</p>
 	<p>Modified from <a href="http://github.com/350HP">350HP's Churning Karma checker</a>.</p>
 </body>
 
